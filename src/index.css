@@ -346,3 +346,83 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-color);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 60;
+  list-style: none;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.suggestions-list li {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-main);
+  transition: background 0.2s;
+}
+
+.suggestions-list li:last-child {
+  border-bottom: none;
+}
+
+.suggestions-list li:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile Responsiveness */
+.mobile-only-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only-btn {
+    display: flex;
+  }
+
+  .app-container {
+    position: relative;
+  }
+
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    background: #0f172a;
+    border-right: 1px solid var(--glass-border);
+    box-shadow: 10px 0 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 30;
+    backdrop-filter: blur(2px);
+  }
+
+  .user-profile {
+    font-size: 0.75rem;
+  }
+
+  .user-profile span {
+    white-space: nowrap;
+  }
+}

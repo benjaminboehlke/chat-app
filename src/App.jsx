@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useChat } from './useChat';
-import { Coffee, MapPin, Hash, Send } from 'lucide-react';
+import { Coffee, MapPin, Hash, Send, Menu, X } from 'lucide-react';
 import './index.css';
 
 const ROOMS = [
@@ -13,6 +13,43 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [showModal, setShowModal] = useState(true);
   const [activeRoom, setActiveRoom] = useState(ROOMS[0].id);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const [locationQuery, setLocationQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  const fetchSuggestions = async (query) => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`);
+      const data = await res.json();
+      setSuggestions(data);
+    } catch (err) {
+      console.error("Failed to fetch location suggestions", err);
+    }
+  };
+
+  const handleLocationChange = (e) => {
+    const val = e.target.value;
+    setLocationQuery(val);
+    setSelectedLocation(null);
+    fetchSuggestions(val);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    // Simplify the display name (e.g. keep just the city/town name)
+    const shortName = suggestion.display_name.split(',')[0];
+    setLocationQuery(shortName);
+    setSelectedLocation({
+      lat: suggestion.lat,
+      lon: suggestion.lon
+    });
+    setSuggestions([]);
+  };
 
   useEffect(() => {
     const profile = localStorage.getItem('espresso-profile');
@@ -29,7 +66,9 @@ function App() {
       nickname: formData.get('nickname'),
       age: formData.get('age'),
       gender: formData.get('gender'),
-      location: formData.get('location'),
+      location: locationQuery,
+      lat: selectedLocation?.lat || null,
+      lon: selectedLocation?.lon || null,
     };
     localStorage.setItem('espresso-profile', JSON.stringify(profile));
     setUserProfile(profile);
@@ -73,9 +112,25 @@ function App() {
                   <option value="Prefer not to say">Prefer not to say</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="form-group" style={{ position: 'relative' }}>
                 <label>Location</label>
-                <input name="location" required placeholder="E.g. Berlin" />
+                <input 
+                  name="location" 
+                  required 
+                  placeholder="E.g. Berlin" 
+                  value={locationQuery}
+                  onChange={handleLocationChange}
+                  autoComplete="off"
+                />
+                {suggestions.length > 0 && (
+                  <ul className="suggestions-list">
+                    {suggestions.map((s) => (
+                      <li key={s.place_id} onClick={() => handleSuggestionClick(s)}>
+                        {s.display_name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <button type="submit" className="btn-primary">Enter Espresso ☕</button>
             </form>
@@ -85,16 +140,22 @@ function App() {
 
       {!showModal && (
         <>
-          <div className="sidebar">
-            <div className="sidebar-header">
+          <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+            <div className="sidebar-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
               <h1><Coffee size={24} /> Espresso</h1>
+              <button className="mobile-only-btn" onClick={() => setIsSidebarOpen(false)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer'}}>
+                <X size={24} />
+              </button>
             </div>
             <div className="room-list">
               {ROOMS.map((room) => (
                 <div 
                   key={room.id}
                   className={`room-item ${activeRoom === room.id ? 'active' : ''}`}
-                  onClick={() => setActiveRoom(room.id)}
+                  onClick={() => {
+                    setActiveRoom(room.id);
+                    setIsSidebarOpen(false);
+                  }}
                 >
                   <span>{room.icon}</span>
                   <span>{room.name}</span>
@@ -103,9 +164,18 @@ function App() {
             </div>
           </div>
 
+          {isSidebarOpen && (
+            <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>
+          )}
+
           <div className="chat-area">
             <div className="chat-header">
-              <h2>{ROOMS.find(r => r.id === activeRoom)?.icon} {ROOMS.find(r => r.id === activeRoom)?.name}</h2>
+              <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
+                <button className="mobile-only-btn" onClick={() => setIsSidebarOpen(true)} style={{background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer'}}>
+                  <Menu size={24} />
+                </button>
+                <h2>{ROOMS.find(r => r.id === activeRoom)?.icon} {ROOMS.find(r => r.id === activeRoom)?.name}</h2>
+              </div>
               <div className="user-profile">
                 <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                   <span style={{color: isConnected ? '#10b981' : '#ef4444', fontSize: '20px'}}>•</span>
