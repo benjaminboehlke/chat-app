@@ -1,14 +1,14 @@
 :root {
-  --bg-color: #0f172a;
-  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --primary: #8b5cf6;
-  --primary-hover: #7c3aed;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --msg-mine: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-  --msg-other: rgba(255, 255, 255, 0.1);
+  --bg-color: #fdfcfb;
+  --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --primary: #f68084;
+  --primary-hover: #fa6469;
+  --text-main: #2d3748;
+  --text-muted: #4a5568;
+  --msg-mine: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  --msg-other: rgba(255, 255, 255, 0.7);
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
@@ -40,7 +40,7 @@ body {
   height: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -51,7 +51,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -67,7 +67,7 @@ body {
   width: 90%;
   max-width: 450px;
   border: 1px solid var(--glass-border);
-  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);
   transform: translateY(0);
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -75,7 +75,7 @@ body {
 .modal-content h2 {
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
-  background: linear-gradient(to right, #a78bfa, #c084fc);
+  background: linear-gradient(to right, #f68084, #8ec5fc);
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -99,7 +99,7 @@ body {
 
 .form-group input,
 .form-group select {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.5);
   border: 1px solid var(--glass-border);
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
@@ -112,7 +112,7 @@ body {
 .form-group input:focus,
 .form-group select:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 0 0 2px rgba(246, 128, 132, 0.4);
 }
 
 .btn-primary {
@@ -141,7 +141,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-header {
@@ -154,7 +154,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .sidebar-header h1 svg {
@@ -262,6 +262,7 @@ body {
 
 .message-wrapper.mine .message-bubble {
   background: var(--msg-mine);
+  color: white;
   border-bottom-right-radius: 0.25rem;
 }
 
@@ -278,7 +279,7 @@ body {
 .chat-input-form {
   display: flex;
   gap: 1rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.5);
   padding: 0.5rem;
   border-radius: 3rem;
   border: 1px solid var(--glass-border);
@@ -339,12 +340,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .suggestions-list {
@@ -360,7 +361,7 @@ body {
   overflow-y: auto;
   z-index: 60;
   list-style: none;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .suggestions-list li {
@@ -376,7 +377,7 @@ body {
 }
 
 .suggestions-list li:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* Mobile Responsiveness */
@@ -401,9 +402,9 @@ body {
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    background: #0f172a;
+    background: var(--bg-color);
     border-right: 1px solid var(--glass-border);
-    box-shadow: 10px 0 15px -3px rgba(0, 0, 0, 0.5);
+    box-shadow: 10px 0 15px -3px rgba(0, 0, 0, 0.1);
   }
 
   .sidebar.open {
@@ -413,7 +414,7 @@ body {
   .sidebar-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.3);
     z-index: 30;
     backdrop-filter: blur(2px);
   }
