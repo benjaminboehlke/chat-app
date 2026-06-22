@@ -45,6 +45,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
+  overflow-x: hidden;
 }
 
 /* Modal Styles */
@@ -287,6 +288,7 @@ body {
 
 .chat-input-form input {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   padding: 0.5rem 1rem;
@@ -301,6 +303,7 @@ body {
   border: none;
   width: 40px;
   height: 40px;
+  flex-shrink: 0;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -450,7 +453,7 @@ body {
   display: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .mobile-only-btn {
     display: flex;
   }
@@ -507,5 +510,27 @@ body {
 
   .users-sidebar.open {
     transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  
+  .chat-header {
+    padding: 1rem;
+  }
+  
+  .chat-header h2 {
+    font-size: 1.1rem;
+  }
+  
+  .messages-container {
+    padding: 1rem;
+  }
+  
+  .chat-input-area {
+    padding: 1rem;
   }
 }

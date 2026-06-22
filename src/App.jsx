@@ -180,12 +180,12 @@ function App() {
               <div className="user-profile">
                 <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                   <span style={{color: isConnected ? '#10b981' : '#ef4444', fontSize: '20px'}}>•</span>
-                  {isConnected ? 'Connected' : 'Connecting...'}
+                  <span className="desktop-only">{isConnected ? 'Connected' : 'Connecting...'}</span>
                 </div>
-                <span>|</span>
-                <span>{userProfile?.nickname}</span>
-                <span>|</span>
-                <span style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+                <span className="desktop-only">|</span>
+                <span className="desktop-only">{userProfile?.nickname}</span>
+                <span className="desktop-only">|</span>
+                <span className="desktop-only" style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                   <MapPin size={14} /> {userProfile?.location}
                 </span>
                 <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(true)} style={{background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', marginLeft: '0.5rem'}} title="Show online users">
