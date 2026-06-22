@@ -8,6 +8,7 @@ const TOPIC_PREFIX = 'espresso-chat-app-v1/';
 
 export function useChat(room, userProfile) {
   const [messages, setMessages] = useState([]);
+  const [activeUsers, setActiveUsers] = useState(new Map());
   const [client, setClient] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
@@ -24,18 +25,31 @@ export function useChat(room, userProfile) {
       }
     }
 
+    const clientId = `espresso_${Math.random().toString(16).slice(3)}`;
+    const presenceTopic = `${TOPIC_PREFIX}presence/${clientId}`;
+
     const mqttClient = mqtt.connect(BROKER_URL, {
-      clientId: `espresso_${Math.random().toString(16).slice(3)}`,
+      clientId,
       clean: true,
       connectTimeout: 4000,
       reconnectPeriod: 1000,
+      will: {
+        topic: presenceTopic,
+        payload: '',
+        retain: true,
+        qos: 1
+      }
     });
 
     mqttClient.on('connect', () => {
       console.log('Connected to MQTT Broker');
       setIsConnected(true);
-      // Subscribe to all rooms so messages are received even if not currently in that room
-      mqttClient.subscribe(`${TOPIC_PREFIX}#`, (err) => {
+      
+      // Publish our own online presence with the user profile
+      mqttClient.publish(presenceTopic, JSON.stringify(userProfile), { retain: true, qos: 1 });
+
+      // Subscribe to all rooms and presence updates
+      mqttClient.subscribe([`${TOPIC_PREFIX}#`, `${TOPIC_PREFIX}presence/+`], (err) => {
         if (err) console.error('Subscription error:', err);
       });
     });
@@ -43,6 +57,30 @@ export function useChat(room, userProfile) {
     mqttClient.on('message', (topic, payload) => {
       try {
         const messageStr = payload.toString();
+
+        // Handle presence messages
+        if (topic.startsWith(`${TOPIC_PREFIX}presence/`)) {
+          const userId = topic.split('/').pop();
+          if (messageStr.length === 0) {
+            // Empty payload means offline
+            setActiveUsers(prev => {
+              const newMap = new Map(prev);
+              newMap.delete(userId);
+              return newMap;
+            });
+          } else {
+            // User is online
+            const userData = JSON.parse(messageStr);
+            setActiveUsers(prev => {
+              const newMap = new Map(prev);
+              newMap.set(userId, userData);
+              return newMap;
+            });
+          }
+          return;
+        }
+
+        // Handle chat messages
         const messageData = JSON.parse(messageStr);
         
         const messageRoom = topic.replace(TOPIC_PREFIX, '');
@@ -66,6 +104,8 @@ export function useChat(room, userProfile) {
     setClient(mqttClient);
 
     return () => {
+      // Clear our presence before disconnecting cleanly
+      mqttClient.publish(presenceTopic, '', { retain: true, qos: 1 });
       mqttClient.end();
     };
   }, [userProfile]); // re-run only if profile changes or unmounts
@@ -87,6 +127,7 @@ export function useChat(room, userProfile) {
 
   // Filter messages for the current room
   const currentRoomMessages = messages.filter(m => m.room === room);
+  const activeUsersList = Array.from(activeUsers.values());
 
-  return { messages: currentRoomMessages, sendMessage, isConnected };
+  return { messages: currentRoomMessages, sendMessage, isConnected, activeUsers: activeUsersList };
 }

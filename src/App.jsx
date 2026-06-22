@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useChat } from './useChat';
-import { Coffee, MapPin, Hash, Send, Menu, X } from 'lucide-react';
+import { Coffee, MapPin, Hash, Send, Menu, X, Users } from 'lucide-react';
 import './index.css';
 
 const ROOMS = [
@@ -14,6 +14,7 @@ function App() {
   const [showModal, setShowModal] = useState(true);
   const [activeRoom, setActiveRoom] = useState(ROOMS[0].id);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUsersSidebarOpen, setIsUsersSidebarOpen] = useState(false);
 
   const [locationQuery, setLocationQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -75,7 +76,7 @@ function App() {
     setShowModal(false);
   };
 
-  const { messages, sendMessage, isConnected } = useChat(activeRoom, userProfile);
+  const { messages, sendMessage, isConnected, activeUsers } = useChat(activeRoom, userProfile);
   const [inputText, setInputText] = useState('');
 
   const handleSendMessage = (e) => {
@@ -187,6 +188,9 @@ function App() {
                 <span style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
                   <MapPin size={14} /> {userProfile?.location}
                 </span>
+                <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(true)} style={{background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', marginLeft: '0.5rem'}} title="Show online users">
+                  <Users size={24} />
+                </button>
               </div>
             </div>
 
@@ -231,6 +235,31 @@ function App() {
               </form>
             </div>
           </div>
+
+          <div className={`users-sidebar ${isUsersSidebarOpen ? 'open' : ''}`}>
+            <div className="users-sidebar-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem'}}><Users size={20} /> Online ({activeUsers?.length || 0})</h2>
+              <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(false)} style={{background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer'}}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="users-list">
+              {activeUsers?.length > 0 ? activeUsers.map((u, i) => (
+                <div key={i} className="user-item">
+                  <div className="user-info">
+                    <span className="user-name">{u.nickname}</span>
+                    <span className="user-age-gender">{u.age}, {u.gender}</span>
+                  </div>
+                  <span className="user-location">{u.location}</span>
+                </div>
+              )) : (
+                <div className="no-users">Just you right now!</div>
+              )}
+            </div>
+          </div>
+          {isUsersSidebarOpen && (
+            <div className="sidebar-overlay" onClick={() => setIsUsersSidebarOpen(false)}></div>
+          )}
         </>
       )}
     </div>
