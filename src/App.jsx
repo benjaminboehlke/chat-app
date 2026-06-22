@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useChat } from './useChat';
-import { Coffee, MapPin, Hash, Send, Menu, X, Users } from 'lucide-react';
+import { MapPin, Hash, Send, Menu, X, Users } from 'lucide-react';
+import appIcon from '../app-icon.svg';
 import './index.css';
 
 const ROOMS = [
@@ -115,10 +116,10 @@ function App() {
               </div>
               <div className="form-group" style={{ position: 'relative' }}>
                 <label>Location</label>
-                <input 
-                  name="location" 
-                  required 
-                  placeholder="E.g. Berlin" 
+                <input
+                  name="location"
+                  required
+                  placeholder="E.g. Berlin"
                   value={locationQuery}
                   onChange={handleLocationChange}
                   autoComplete="off"
@@ -142,15 +143,15 @@ function App() {
       {!showModal && (
         <>
           <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-            <div className="sidebar-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-              <h1><Coffee size={24} /> Espresso</h1>
-              <button className="mobile-only-btn" onClick={() => setIsSidebarOpen(false)} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer'}}>
+            <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h1><img className="app-icon" src={appIcon} alt="Espresso Icon" style={{ width: '3rem', height: '3rem' }} /> espresso</h1>
+              <button className="mobile-only-btn" onClick={() => setIsSidebarOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
                 <X size={24} />
               </button>
             </div>
             <div className="room-list">
               {ROOMS.map((room) => (
-                <div 
+                <div
                   key={room.id}
                   className={`room-item ${activeRoom === room.id ? 'active' : ''}`}
                   onClick={() => {
@@ -171,24 +172,24 @@ function App() {
 
           <div className="chat-area">
             <div className="chat-header">
-              <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
-                <button className="mobile-only-btn" onClick={() => setIsSidebarOpen(true)} style={{background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer'}}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <button className="mobile-only-btn" onClick={() => setIsSidebarOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer' }}>
                   <Menu size={24} />
                 </button>
                 <h2>{ROOMS.find(r => r.id === activeRoom)?.icon} {ROOMS.find(r => r.id === activeRoom)?.name}</h2>
               </div>
               <div className="user-profile">
-                <div style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
-                  <span style={{color: isConnected ? '#10b981' : '#ef4444', fontSize: '20px'}}>•</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: isConnected ? '#10b981' : '#ef4444', fontSize: '20px' }}>•</span>
                   <span className="desktop-only">{isConnected ? 'Connected' : 'Connecting...'}</span>
                 </div>
                 <span className="desktop-only">|</span>
                 <span className="desktop-only">{userProfile?.nickname}</span>
                 <span className="desktop-only">|</span>
-                <span className="desktop-only" style={{display: 'flex', alignItems: 'center', gap: '4px'}}>
+                <span className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <MapPin size={14} /> {userProfile?.location}
                 </span>
-                <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(true)} style={{background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', marginLeft: '0.5rem'}} title="Show online users">
+                <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', marginLeft: '0.5rem' }} title="Show online users">
                   <Users size={24} />
                 </button>
               </div>
@@ -196,7 +197,7 @@ function App() {
 
             <div className="messages-container">
               {messages.length === 0 ? (
-                <div style={{textAlign: 'center', color: 'var(--text-muted)', marginTop: '2rem'}}>
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '2rem' }}>
                   No messages yet. Be the first to say hi!
                 </div>
               ) : (
@@ -209,7 +210,7 @@ function App() {
                         <span>•</span>
                         <span>{msg.age}, {msg.gender?.charAt(0)}</span>
                         <span>•</span>
-                        <span>{new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                       <div className="message-bubble">
                         {msg.text}
@@ -222,8 +223,8 @@ function App() {
 
             <div className="chat-input-area">
               <form className="chat-input-form" onSubmit={handleSendMessage}>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={`Message ${ROOMS.find(r => r.id === activeRoom)?.name}...`}
@@ -237,9 +238,9 @@ function App() {
           </div>
 
           <div className={`users-sidebar ${isUsersSidebarOpen ? 'open' : ''}`}>
-            <div className="users-sidebar-header" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-              <h2 style={{margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem'}}><Users size={20} /> Online ({activeUsers?.length || 0})</h2>
-              <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(false)} style={{background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer'}}>
+            <div className="users-sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Users size={20} /> Online ({activeUsers?.length || 0})</h2>
+              <button className="mobile-only-btn" onClick={() => setIsUsersSidebarOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer' }}>
                 <X size={24} />
               </button>
             </div>
