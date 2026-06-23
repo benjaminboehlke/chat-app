@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useChat } from './useChat';
-import { MapPin, Hash, Send, Menu, X, Users } from 'lucide-react';
+import { MapPin, Send, Menu, X, Users, Camera } from 'lucide-react';
 import appIcon from '../app-icon.svg';
 import './index.css';
 
@@ -20,6 +20,28 @@ function App() {
   const [locationQuery, setLocationQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
+
+  // --- Avatar upload ---
+  const [avatarBase64, setAvatarBase64] = useState(null);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const avatarInputRef = useRef(null);
+
+  const processAvatarFile = useCallback((file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => setAvatarBase64(e.target.result);
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleAvatarDrop = useCallback((e) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+    processAvatarFile(e.dataTransfer.files?.[0]);
+  }, [processAvatarFile]);
+
+  const handleAvatarFileChange = useCallback((e) => {
+    processAvatarFile(e.target.files?.[0]);
+  }, [processAvatarFile]);
 
   const fetchSuggestions = async (query) => {
     if (query.length < 3) {
@@ -71,6 +93,7 @@ function App() {
       location: locationQuery,
       lat: selectedLocation?.lat || null,
       lon: selectedLocation?.lon || null,
+      avatar: avatarBase64 || null,
     };
     localStorage.setItem('espresso-profile', JSON.stringify(profile));
     setUserProfile(profile);
@@ -96,6 +119,32 @@ function App() {
             <h2>Welcome to Espresso</h2>
             <p>A quick shot of connection. Tell us about yourself before you enter.</p>
             <form onSubmit={handleProfileSubmit}>
+
+              {/* ── Avatar upload ── */}
+              <div className="form-group">
+                <label>Profile Photo <span style={{ fontWeight: 400 }}>(optional)</span></label>
+                <div
+                  className={`avatar-upload-zone${isDraggingOver ? ' drag-over' : ''}${avatarBase64 ? ' has-avatar' : ''}`}
+                  onClick={() => avatarInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setIsDraggingOver(true); }}
+                  onDragLeave={() => setIsDraggingOver(false)}
+                  onDrop={handleAvatarDrop}
+                >
+                  {avatarBase64 ? (
+                    <>
+                      <img src={avatarBase64} alt="preview" className="avatar-upload-preview" />
+                      <div className="avatar-upload-hint"><Camera size={13} /> Change photo</div>
+                    </>
+                  ) : (
+                    <div className="avatar-upload-placeholder">
+                      <Camera size={26} />
+                      <span>Drop image here or <strong>click to upload</strong></span>
+                    </div>
+                  )}
+                </div>
+                <input ref={avatarInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarFileChange} />
+              </div>
+
               <div className="form-group">
                 <label>Nickname</label>
                 <input name="nickname" required placeholder="E.g. CoolBeans" maxLength={20} />
@@ -203,17 +252,26 @@ function App() {
               ) : (
                 messages.map((msg) => {
                   const isMine = msg.sender === userProfile?.nickname;
+                  const avatarSrc = isMine ? userProfile?.avatar : msg.avatar;
+                  const initials = (isMine ? userProfile?.nickname : msg.sender)?.charAt(0).toUpperCase();
                   return (
                     <div key={msg.id} className={`message-wrapper ${isMine ? 'mine' : 'other'}`}>
-                      <div className="message-meta">
-                        <span>{msg.sender}</span>
-                        <span>•</span>
-                        <span>{msg.age}, {msg.gender?.charAt(0)}</span>
-                        <span>•</span>
-                        <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                      <div className="message-bubble">
-                        {msg.text}
+                      <div className="message-row">
+                        <div className="msg-avatar">
+                          {avatarSrc ? <img src={avatarSrc} alt="" /> : <span>{initials}</span>}
+                        </div>
+                        <div className="message-body">
+                          <div className="message-meta">
+                            <span>{msg.sender}</span>
+                            <span>•</span>
+                            <span>{msg.age}, {msg.gender?.charAt(0)}</span>
+                            <span>•</span>
+                            <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <div className="message-bubble">
+                            {msg.text}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
@@ -247,11 +305,16 @@ function App() {
             <div className="users-list">
               {activeUsers?.length > 0 ? activeUsers.map((u, i) => (
                 <div key={i} className="user-item">
-                  <div className="user-info">
-                    <span className="user-name">{u.nickname}</span>
-                    <span className="user-age-gender">{u.age}, {u.gender}</span>
+                  <div className="user-item-avatar">
+                    {u.avatar ? <img src={u.avatar} alt="" /> : <span>{u.nickname?.charAt(0).toUpperCase()}</span>}
                   </div>
-                  <span className="user-location">{u.location}</span>
+                  <div>
+                    <div className="user-info">
+                      <span className="user-name">{u.nickname}</span>
+                      <span className="user-age-gender">{u.age}, {u.gender}</span>
+                    </div>
+                    <span className="user-location">{u.location}</span>
+                  </div>
                 </div>
               )) : (
                 <div className="no-users">Just you right now!</div>

@@ -119,7 +119,8 @@ export function useChat(room, userProfile) {
         timestamp: new Date().toISOString(),
         gender: userProfile.gender,
         age: userProfile.age,
-        location: userProfile.location
+        location: userProfile.location,
+        avatar: userProfile.avatar || null,
       });
       client.publish(topic, payload, { qos: 0 });
     }
